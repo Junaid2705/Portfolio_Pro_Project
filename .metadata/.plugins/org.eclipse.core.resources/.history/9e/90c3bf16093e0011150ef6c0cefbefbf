@@ -1,0 +1,33 @@
+spring.application.name=portfolio_pro
+# ============================
+# Database Config
+# ============================
+spring.datasource.url=jdbc:mysql://localhost:3306/portfolio_pro
+spring.datasource.username=root
+spring.datasource.password=root
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# ============================
+# JPA / Hibernate
+# ============================
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+
+# ============================
+# JWT Config (keep this secret!)
+# ============================
+app.jwt.secret=PortfolioPro2024SecretKey!ChangeThisInProduction@#$
+app.jwt.expiration-ms=86400000
+
+# ============================
+# File Upload
+# ============================
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+
+# ============================
+# Server
+# ============================
+server.port=8080

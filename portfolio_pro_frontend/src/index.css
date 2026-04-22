@@ -1,0 +1,41 @@
+/* src/index.css */
+@import url("https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: "Outfit", sans-serif;
+  background: #060612;
+  color: #e8e6f0;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+button {
+  font-family: "Outfit", sans-serif;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+input {
+  font-family: "Outfit", sans-serif;
+  outline: none;
+  border: none;
+}
