@@ -1,5 +1,7 @@
-package com.example.portfolio_pro.controller;
+// PATH: src/main/java/com/example/portfolio_pro/controller/AuthController.java
+// FIXED: Removed @CrossOrigin — CORS is now handled globally in SecurityConfig
 
+package com.example.portfolio_pro.controller;
 
 import com.example.portfolio_pro.dto.AuthResponse;
 import com.example.portfolio_pro.dto.LoginRequest;
@@ -11,12 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
     private final AuthService authService;
 
-    // Manual constructor instead of @RequiredArgsConstructor
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
