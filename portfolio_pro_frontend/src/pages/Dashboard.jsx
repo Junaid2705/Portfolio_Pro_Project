@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyPortfolio, publishPortfolio } from "../api/portfolioApi";
 import "./Dashboard.css";
+import Sidebar from '../components/Sidebar'
 
 export default function Dashboard() {
   const [portfolio, setPortfolio] = useState(null);
@@ -57,47 +58,7 @@ export default function Dashboard() {
   return (
     <div className="db-root">
       {/* Sidebar */}
-      <aside className="db-sidebar">
-        <div className="db-logo">
-          <div className="db-logo-icon">PP</div>
-          <span>
-            Portfolio<strong>Pro</strong>
-          </span>
-        </div>
-
-        <nav className="db-nav">
-          <div className="db-nav-item active">
-            <span className="db-nav-icon">⊞</span> Dashboard
-          </div>
-          <div
-            className="db-nav-item"
-            onClick={() => navigate("/portfolio/builder")}
-          >
-            <span className="db-nav-icon">✏</span> Portfolio Builder
-          </div>
-          <div className="db-nav-item disabled">
-            <span className="db-nav-icon">⬡</span> Projects
-            <span className="db-nav-badge">Day 4</span>
-          </div>
-          <div className="db-nav-item disabled">
-            <span className="db-nav-icon">✉</span> Messages
-            <span className="db-nav-badge">Day 4</span>
-          </div>
-        </nav>
-
-        <div className="db-sidebar-bottom">
-          <div className="db-user-chip">
-            <div className="db-avatar">{initials}</div>
-            <div className="db-user-info">
-              <span className="db-user-name">{name}</span>
-              <span className="db-user-email">{email}</span>
-            </div>
-          </div>
-          <button className="db-logout-btn" onClick={handleLogout}>
-            ⎋ Logout
-          </button>
-        </div>
-      </aside>
+      <Sidebar />
 
       {/* Main content */}
       <main className={`db-main ${visible ? "db-visible" : ""}`}>
@@ -270,6 +231,24 @@ export default function Dashboard() {
                   >
                     ✏ Edit Portfolio
                   </button>
+                  <button
+                    className="db-action-btn"
+                    onClick={() => navigate("/portfolio/preview")}
+                  >
+                    👁 Preview
+                  </button>
+                  {portfolio.status === "PUBLISHED" &&
+                    portfolio.publicUrlSlug && (
+                      <a
+                        href={`/portfolio/${portfolio.publicUrlSlug}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="db-action-btn"
+                        style={{ textDecoration: "none", textAlign: "center" }}
+                      >
+                        🌐 View Live ↗
+                      </a>
+                    )}
                   <button
                     className="db-action-btn"
                     onClick={handlePublish}

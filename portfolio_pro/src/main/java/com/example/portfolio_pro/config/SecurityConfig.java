@@ -1,4 +1,6 @@
 // PATH: src/main/java/com/example/portfolio_pro/config/SecurityConfig.java
+// FIX 2: /api/contact/** is public
+// FIX 4: Longer JWT expiration
 
 package com.example.portfolio_pro.config;
 
@@ -41,40 +43,30 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/portfolio/public/**").permitAll()
+                .requestMatchers("/api/contact/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
+            .addFilterBefore(jwtAuthFilter,
+                UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
-        // Allow React on these ports
         config.setAllowedOrigins(Arrays.asList(
             "http://localhost:3000",
             "http://localhost:5173",
             "http://127.0.0.1:3000",
             "http://127.0.0.1:5173"
         ));
-
-        // Allow all HTTP methods
         config.setAllowedMethods(Arrays.asList(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+            "GET","POST","PUT","DELETE","OPTIONS","PATCH"
         ));
-
-        // Allow all headers
         config.setAllowedHeaders(List.of("*"));
-
-        // Allow Authorization header to be sent
         config.setAllowCredentials(true);
-
-        // Cache preflight for 1 hour
         config.setMaxAge(3600L);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

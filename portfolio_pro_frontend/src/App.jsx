@@ -1,10 +1,17 @@
 // src/App.jsx
+// FIX 5: /p/:slug is now completely public — no PrivateRoute wrapper
 
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import PortfolioBuilder from "./pages/PortfolioBuilder";
+import Projects from "./pages/Projects";
+import Messages from "./pages/Messages";
+import PublicPortfolio from "./pages/PublicPortfolio";
+import AdminDashboard from "./pages/AdminDashboard";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function PrivateRoute({ children, requiredRole }) {
   const token = localStorage.getItem("token");
@@ -19,9 +26,15 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Auth */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* ✅ PUBLIC — anyone can visit without login */}
+        <Route path="/p/:slug" element={<PublicPortfolio />} />
 
         {/* User routes */}
         <Route
@@ -40,31 +53,37 @@ export default function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/projects"
+          element={
+            <PrivateRoute requiredRole="USER">
+              <Projects />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <PrivateRoute requiredRole="USER">
+              <Messages />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/portfolio/preview"
+          element={
+            <PrivateRoute requiredRole="USER">
+              <PublicPortfolio previewMode={true} />
+            </PrivateRoute>
+          }
+        />
 
-        {/* Admin placeholder — Day 5 */}
+        {/* Admin routes */}
         <Route
           path="/admin/dashboard"
           element={
             <PrivateRoute requiredRole="ADMIN">
-              <div style={{ padding: 40, color: "#fff", fontFamily: "Outfit" }}>
-                <h1>Admin Panel — Coming Day 5</h1>
-                <button
-                  onClick={() => {
-                    localStorage.clear();
-                    window.location.href = "/login";
-                  }}
-                  style={{
-                    marginTop: 20,
-                    padding: "10px 24px",
-                    background: "#5b4bde",
-                    color: "#fff",
-                    borderRadius: 8,
-                    cursor: "pointer",
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
+              <AdminDashboard />
             </PrivateRoute>
           }
         />

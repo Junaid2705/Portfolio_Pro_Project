@@ -282,7 +282,7 @@ export default function Login() {
               <span>demo credentials</span>
             </div>
 
-            <div className="demo-box">
+            {/* <div className="demo-box">
               <div className="demo-grid">
                 <div>
                   <strong>Admin login</strong>
@@ -295,7 +295,7 @@ export default function Login() {
                   <code>account below</code>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <p className="switch-link">
               Don&apos;t have an account?{" "}

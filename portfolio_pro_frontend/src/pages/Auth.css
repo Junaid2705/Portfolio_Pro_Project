@@ -559,3 +559,187 @@
     font-size: 32px;
   }
 }
+/* ADD THESE AT THE BOTTOM OF src/pages/Auth.css */
+/* Success screen styles */
+
+.success-screen {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.success-card {
+  width: 100%;
+  max-width: 460px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 28px;
+  padding: 48px 40px;
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow:
+    0 0 0 1px rgba(139, 111, 255, 0.08),
+    0 32px 80px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  text-align: center;
+  animation: fadeUp 0.5s ease both;
+}
+
+/* Animated check icon */
+.success-icon-wrap {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+}
+.success-svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes drawCircle {
+  from {
+    stroke-dashoffset: 239;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes drawCheck {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.success-title {
+  font-family: "Clash Display", "Outfit", sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #f0eeff;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.success-subtitle {
+  font-size: 15px;
+  color: #6b6988;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+.success-subtitle strong {
+  color: #a98aff;
+}
+
+/* Account details box */
+.success-details {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.success-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+.success-detail-label {
+  color: #5e5c78;
+}
+.success-detail-value {
+  color: #c8c6e0;
+  font-weight: 500;
+}
+
+/* What's next */
+.success-next {
+  margin-bottom: 28px;
+  text-align: left;
+}
+.success-next-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #4a4868;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.success-next-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.success-next-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #4a4868;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.success-next-step.done {
+  color: #00c878;
+  background: rgba(0, 200, 120, 0.06);
+}
+.success-next-step.active {
+  color: #8b6fff;
+  background: rgba(139, 111, 255, 0.08);
+  border: 1px solid rgba(139, 111, 255, 0.15);
+  font-weight: 500;
+}
+.success-next-step span {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+}
+
+/* Countdown */
+.success-countdown {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+.countdown-circle {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+}
+.countdown-circle svg {
+  width: 100%;
+  height: 100%;
+}
+.countdown-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Clash Display", "Outfit", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #8b6fff;
+}
+.success-countdown p {
+  font-size: 13px;
+  color: #5e5c78;
+  text-align: left;
+}
+.success-countdown strong {
+  color: #a98aff;
+}
