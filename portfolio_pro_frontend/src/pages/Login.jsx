@@ -278,9 +278,9 @@ export default function Login() {
               </button>
             </form>
 
-            <div className="form-divider">
+            {/* <div className="form-divider">
               <span>demo credentials</span>
-            </div>
+            </div> */}
 
             {/* <div className="demo-box">
               <div className="demo-grid">

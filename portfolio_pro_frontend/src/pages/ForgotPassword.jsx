@@ -1,16 +1,16 @@
 // src/pages/ForgotPassword.jsx
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Auth.css";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState("");
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,14 +21,23 @@ export default function ForgotPassword() {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(
-        "http://localhost:8080/api/auth/forgot-password",
-        { email },
-      );
-      setToken(res.data.token);
+      // Hit your new Spring Boot endpoint
+      await axios.post("http://localhost:8080/api/auth/forgot-password", {
+        email,
+      });
+
+      // Store email temporarily so ResetPassword page knows who is resetting
+      sessionStorage.setItem("resetEmail", email);
+
       setDone(true);
+
+      // Auto-redirect after 3 seconds
+      setTimeout(() => {
+        navigate("/reset-password");
+      }, 3000);
     } catch (err) {
-      setError(err.response?.data?.error || "Something went wrong");
+      // Temporarily show the REAL error to help us debug
+      setError(err.message || "Network Error");
     } finally {
       setLoading(false);
     }
@@ -51,7 +60,7 @@ export default function ForgotPassword() {
         <div className="form-header">
           <div style={{ fontSize: 36, marginBottom: 12 }}>🔐</div>
           <h2>Forgot Password</h2>
-          <p>Enter your email to get a reset token</p>
+          <p>Enter your email to receive a 6-digit code</p>
         </div>
 
         {!done ? (
@@ -65,19 +74,7 @@ export default function ForgotPassword() {
               <div className="field">
                 <label>Email address</label>
                 <div className="input-wrap">
-                  <span className="input-icon">
-                    <svg
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    >
-                      <path
-                        d="M2 5l8 6 8-6M2 5h16v12H2z"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
+                  <span className="input-icon">✉️</span>
                   <input
                     type="email"
                     value={email}
@@ -94,7 +91,7 @@ export default function ForgotPassword() {
                 {loading ? (
                   <span className="btn-spinner" />
                 ) : (
-                  "Get Reset Token →"
+                  "Send Reset Code →"
                 )}
               </button>
             </form>
@@ -110,29 +107,18 @@ export default function ForgotPassword() {
                 marginBottom: 20,
               }}
             >
-              <p style={{ color: "#00c878", fontWeight: 600, marginBottom: 8 }}>
-                ✓ Token Generated!
-              </p>
-              <p style={{ color: "#6b6988", fontSize: 13, marginBottom: 16 }}>
-                Your reset token (copy this):
-              </p>
-              <div
+              <p
                 style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: 10,
-                  padding: "12px 16px",
-                  fontFamily: "monospace",
-                  fontSize: 22,
-                  fontWeight: 700,
-                  color: "#f0eeff",
-                  letterSpacing: "0.15em",
+                  color: "#00c878",
+                  fontWeight: 600,
+                  marginBottom: 8,
+                  fontSize: 18,
                 }}
               >
-                {token}
-              </div>
-              <p style={{ color: "#4a4868", fontSize: 11, marginTop: 10 }}>
-                In production this would be sent to your email
+                ✓ Code Sent!
+              </p>
+              <p style={{ color: "#c8c6e0", fontSize: 14 }}>
+                Check your email inbox (and spam folder) for the 6-digit code.
               </p>
             </div>
             <Link
@@ -144,7 +130,7 @@ export default function ForgotPassword() {
                 textAlign: "center",
               }}
             >
-              Use Token to Reset Password →
+              Enter Code →
             </Link>
           </div>
         )}

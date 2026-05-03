@@ -3,16 +3,34 @@
 package com.example.portfolio_pro.dto;
 
 public class ContactRequest {
-    private String senderName;
-    private String senderEmail;
-    private String message;
+	private String senderName;
+	private String senderEmail;
+	private String message;
 
-    public ContactRequest() {}
+	public ContactRequest() {
+	}
 
-    public String getSenderName()            { return senderName; }
-    public void setSenderName(String n)      { this.senderName = n; }
-    public String getSenderEmail()           { return senderEmail; }
-    public void setSenderEmail(String e)     { this.senderEmail = e; }
-    public String getMessage()               { return message; }
-    public void setMessage(String m)         { this.message = m; }
+	public String getSenderName() {
+		return senderName;
+	}
+
+	public void setSenderName(String n) {
+		this.senderName = n;
+	}
+
+	public String getSenderEmail() {
+		return senderEmail;
+	}
+
+	public void setSenderEmail(String e) {
+		this.senderEmail = e;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String m) {
+		this.message = m;
+	}
 }

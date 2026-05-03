@@ -53,7 +53,27 @@ export default function PortfolioBuilder() {
   useEffect(() => {
     loadExisting();
   }, []);
+  // Add this function inside your component
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (Optional but recommended so the database doesn't crash)
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image is too large! Please pick an image under 2MB.");
+        return;
+      }
 
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result; // This is the giant text string!
+
+        // Update your portfolio state (change setPortfolio to whatever state you use)
+        setPortfolio((prev) => ({ ...prev, profileImage: base64String }));
+      };
+
+      reader.readAsDataURL(file); // This triggers the conversion
+    }
+  };
   const loadExisting = async () => {
     try {
       const data = await getMyPortfolio();
@@ -85,25 +105,7 @@ export default function PortfolioBuilder() {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
   };
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setUploadingImg(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await API.post("/api/upload/profile-image", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      const url = res.data.imageUrl;
-      setProfileImageUrl(url);
-      setForm((f) => ({ ...f, profileImage: url }));
-    } catch (err) {
-      alert(err.response?.data?.error || "Upload failed");
-    } finally {
-      setUploadingImg(false);
-    }
-  };
+  
   const addSkill = () => {
     if (!newSkill.skillName.trim()) return;
     setForm({ ...form, skills: [...form.skills, { ...newSkill }] });

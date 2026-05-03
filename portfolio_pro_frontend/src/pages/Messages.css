@@ -307,3 +307,9 @@
     padding: 24px 20px;
   }
 }
+/* Push content down when the mobile hamburger menu appears */
+@media (max-width: 768px) {
+  .page-main {
+    padding-top: 76px;
+  }
+}

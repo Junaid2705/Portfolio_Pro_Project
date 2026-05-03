@@ -16,7 +16,7 @@ public class ProjectResponse {
     private String githubLink;
     private Integer displayOrder;
     private LocalDateTime createdAt;
-
+    private String profileImage;
     public ProjectResponse(Project p) {
         this.id           = p.getId();
         this.portfolioId  = p.getPortfolio().getId();

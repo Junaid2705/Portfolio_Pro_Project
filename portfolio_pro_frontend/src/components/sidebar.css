@@ -1,17 +1,17 @@
-/* src/components/Sidebar.css */
-
 .sidebar {
   width: 240px;
   flex-shrink: 0;
-  background: rgba(255,255,255,0.03);
-  border-right: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.03);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
   padding: 28px 16px;
   position: sticky;
   top: 0;
   height: 100vh;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
+  transition: transform 0.3s ease; /* Added for smooth slide animation */
+  z-index: 1000;
 }
 
 .sidebar-logo {
@@ -24,13 +24,20 @@
   color: #c8c6e0;
   cursor: pointer;
 }
-.sidebar-logo strong { color: #8b6fff; }
+.sidebar-logo strong {
+  color: #8b6fff;
+}
 .sidebar-logo-icon {
-  width: 34px; height: 34px;
+  width: 34px;
+  height: 34px;
   background: linear-gradient(135deg, #8b6fff, #4f9eff);
   border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
 }
 
 .sidebar-nav {
@@ -53,11 +60,11 @@
   user-select: none;
 }
 .sidebar-nav-item:hover {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   color: #c8c6e0;
 }
 .sidebar-nav-item.active {
-  background: rgba(139,111,255,0.12);
+  background: rgba(139, 111, 255, 0.12);
   color: #a98aff;
   font-weight: 500;
 }
@@ -68,7 +75,7 @@
 }
 
 .sidebar-bottom {
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding-top: 16px;
 }
 
@@ -80,11 +87,16 @@
   margin-bottom: 8px;
 }
 .sidebar-avatar {
-  width: 34px; height: 34px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: linear-gradient(135deg, #8b6fff, #4f9eff);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 700; color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
   flex-shrink: 0;
 }
 .sidebar-user-info {
@@ -93,31 +105,101 @@
   min-width: 0;
 }
 .sidebar-user-name {
-  font-size: 13px; font-weight: 500; color: #c8c6e0;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 500;
+  color: #c8c6e0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .sidebar-user-email {
-  font-size: 11px; color: #4a4868;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: 11px;
+  color: #4a4868;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar-logout {
   width: 100%;
   padding: 9px 12px;
-  background: rgba(255,80,80,0.08);
-  border: 1px solid rgba(255,80,80,0.15);
+  background: rgba(255, 80, 80, 0.08);
+  border: 1px solid rgba(255, 80, 80, 0.15);
   border-radius: 10px;
   color: #ff7070;
   font-size: 13px;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
   cursor: pointer;
   transition: all 0.2s;
   text-align: left;
 }
 .sidebar-logout:hover {
-  background: rgba(255,80,80,0.15);
+  background: rgba(255, 80, 80, 0.15);
 }
 
+/* --- NEW: Hide Mobile Elements on Desktop --- */
+.mobile-hamburger {
+  display: none;
+}
+.mobile-close-btn {
+  display: none;
+}
+.sidebar-overlay {
+  display: none;
+}
+
+/* --- NEW: Mobile Slide-in Styles --- */
 @media (max-width: 768px) {
-  .sidebar { display: none; }
+  .mobile-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #8b6fff, #4f9eff);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 998;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .sidebar {
+    position: fixed; /* Detach from flow so it can slide */
+    left: 0;
+    background-color: #1a1a2e; /* Solid background so app content doesn't show through */
+    transform: translateX(-100%); /* Hide off-screen to the left */
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  /* React adds this class when state is true */
+  .sidebar.open {
+    transform: translateX(0); /* Slide in */
+  }
+
+  .mobile-close-btn {
+    display: block;
+    background: transparent;
+    border: none;
+    color: #c8c6e0;
+    font-size: 20px;
+    cursor: pointer;
+    position: absolute;
+    top: 28px;
+    right: 16px;
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0; /* Shorthand for top/left/right/bottom 0 */
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 999; /* Just below the sidebar (1000) */
+  }
 }

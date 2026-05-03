@@ -34,7 +34,7 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* ✅ PUBLIC — anyone can visit without login */}
-        <Route path="/p/:slug" element={<PublicPortfolio />} />
+        <Route path="/portfolio/:slug" element={<PublicPortfolio />} />
 
         {/* User routes */}
         <Route

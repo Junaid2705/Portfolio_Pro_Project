@@ -26,8 +26,7 @@ public class Portfolio {
 	@Column(length = 100)
 	private String designation;
 
-	@Column(name = "profile_image", length = 500)
-	private String profileImage;
+	
 
 	@Column(name = "github_url", length = 300)
 	private String githubUrl;
@@ -85,9 +84,7 @@ public class Portfolio {
 		return designation;
 	}
 
-	public String getProfileImage() {
-		return profileImage;
-	}
+	
 
 	public String getGithubUrl() {
 		return githubUrl;
@@ -146,9 +143,7 @@ public class Portfolio {
 		this.designation = designation;
 	}
 
-	public void setProfileImage(String profileImage) {
-		this.profileImage = profileImage;
-	}
+	
 
 	public void setGithubUrl(String githubUrl) {
 		this.githubUrl = githubUrl;
@@ -184,5 +179,18 @@ public class Portfolio {
 
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	@Lob
+	@Column(columnDefinition = "LONGTEXT")
+	private String profileImage;
+
+	// Make sure to generate the Getter and Setter for this!
+	public String getProfileImage() {
+		return profileImage;
+	}
+
+	public void setProfileImage(String profileImage) {
+		this.profileImage = profileImage;
 	}
 }

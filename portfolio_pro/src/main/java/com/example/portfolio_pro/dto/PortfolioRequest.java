@@ -15,7 +15,7 @@ public class PortfolioRequest {
     private String theme;
     private String publicUrlSlug;
     private List<SkillDto> skills;
-
+    private String profileImage;
     public PortfolioRequest() {}
 
     // Inner SkillDto

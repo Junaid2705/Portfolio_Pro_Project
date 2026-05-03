@@ -508,6 +508,9 @@
   .db-sidebar {
     display: none;
   }
+  .db-main {
+    padding-top: 76px; /* Added for hamburger */
+  }
   .db-stats {
     grid-template-columns: repeat(2, 1fr);
   }

@@ -465,6 +465,9 @@
   .db-sidebar {
     display: none;
   }
+  .proj-main {
+    padding-top: 76px; /* Added for hamburger */
+  }
   .proj-grid {
     grid-template-columns: 1fr;
   }

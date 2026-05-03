@@ -24,12 +24,51 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;
+    
+// Add these below your existing fields (like password, role, etc.)
+    
+    @Column(name = "reset_token")
+    private String resetToken; // We will store the 6-digit OTP here
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry; // When the OTP expires
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status = Status.ACTIVE;
 
-    @Column(name = "created_at")
+    public String getResetToken() {
+		return resetToken;
+	}
+
+	public void setResetToken(String resetToken) {
+		this.resetToken = resetToken;
+	}
+
+	public LocalDateTime getResetTokenExpiry() {
+		return resetTokenExpiry;
+	}
+
+	public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
+		this.resetTokenExpiry = resetTokenExpiry;
+	}
+	// ... your existing resetToken fields ...
+
+    // --- Layout Customization Fields ---
+    private String themeColor = "#6366f1"; // Default purple/indigo color
+    private String backgroundColor = "#1a1a2e"; // Default dark background
+    private String fontFamily = "Inter, sans-serif"; // Default font
+
+    // --- Getters and Setters for the new fields ---
+    public String getThemeColor() { return themeColor; }
+    public void setThemeColor(String themeColor) { this.themeColor = themeColor; }
+
+    public String getBackgroundColor() { return backgroundColor; }
+    public void setBackgroundColor(String backgroundColor) { this.backgroundColor = backgroundColor; }
+
+    public String getFontFamily() { return fontFamily; }
+    public void setFontFamily(String fontFamily) { this.fontFamily = fontFamily; }
+	@Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public enum Role   { ADMIN, USER }
