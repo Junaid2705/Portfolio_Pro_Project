@@ -12,6 +12,8 @@ import PublicPortfolio from "./pages/PublicPortfolio";
 import AdminDashboard from "./pages/AdminDashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import TemplateGallery from "./pages/TemplateGallery";
+import TemplatePreview from "./pages/TemplatePreview";
 
 function PrivateRoute({ children, requiredRole }) {
   const token = localStorage.getItem("token");
@@ -32,6 +34,8 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/templates" element={<TemplateGallery />} />
+        <Route path="/preview" element={<TemplatePreview />} />
 
         {/* ✅ PUBLIC — anyone can visit without login */}
         <Route path="/portfolio/:slug" element={<PublicPortfolio />} />

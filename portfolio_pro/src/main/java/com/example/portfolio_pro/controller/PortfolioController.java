@@ -28,130 +28,149 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/portfolio")
 public class PortfolioController {
 
-	private final PortfolioService   portfolioService;
-    private final PortfolioRepository portfolioRepository;
-    private final SkillRepository     skillRepository;
-    private final ProjectRepository   projectRepository;
-    private final UserRepository      userRepository; // <-- Added here
+	private final PortfolioService portfolioService;
+	private final PortfolioRepository portfolioRepository;
+	private final SkillRepository skillRepository;
+	private final ProjectRepository projectRepository;
+	private final UserRepository userRepository; // <-- Added here
 
-    public PortfolioController(PortfolioService portfolioService,
-                               PortfolioRepository portfolioRepository,
-                               SkillRepository skillRepository,
-                               ProjectRepository projectRepository,
-                               UserRepository userRepository) { // <-- Added here
-        this.portfolioService    = portfolioService;
-        this.portfolioRepository = portfolioRepository;
-        this.skillRepository     = skillRepository;
-        this.projectRepository   = projectRepository;
-        this.userRepository      = userRepository; // <-- Added here
-    
-    }
-  
-    // GET /api/portfolio/my
-    @GetMapping("/my")
-    public ResponseEntity<PortfolioResponse> getMyPortfolio() {
-        return ResponseEntity.ok(portfolioService.getMyPortfolio());
-    }
+	public PortfolioController(PortfolioService portfolioService, PortfolioRepository portfolioRepository,
+			SkillRepository skillRepository, ProjectRepository projectRepository, UserRepository userRepository) { // <--
+																													// Added
+																													// here
+		this.portfolioService = portfolioService;
+		this.portfolioRepository = portfolioRepository;
+		this.skillRepository = skillRepository;
+		this.projectRepository = projectRepository;
+		this.userRepository = userRepository; // <-- Added here
 
-    // POST /api/portfolio/create
-    @PostMapping("/create")
-    public ResponseEntity<PortfolioResponse> createPortfolio(
-            @RequestBody PortfolioRequest request) {
-        return ResponseEntity.ok(portfolioService.createPortfolio(request));
-    }
+	}
 
-    // PUT /api/portfolio/update
-    @PutMapping("/update")
-    public ResponseEntity<PortfolioResponse> updatePortfolio(
-            @RequestBody PortfolioRequest request) {
-        return ResponseEntity.ok(portfolioService.updatePortfolio(request));
-    }
+	// GET /api/portfolio/my
+	@GetMapping("/my")
+	public ResponseEntity<PortfolioResponse> getMyPortfolio() {
+		return ResponseEntity.ok(portfolioService.getMyPortfolio());
+	}
 
-    // PUT /api/portfolio/publish
-    @PutMapping("/publish")
-    public ResponseEntity<PortfolioResponse> publishPortfolio() {
-        return ResponseEntity.ok(portfolioService.publishPortfolio());
-    }
+	// POST /api/portfolio/create
+	@PostMapping("/create")
+	public ResponseEntity<PortfolioResponse> createPortfolio(@RequestBody PortfolioRequest request) {
+		return ResponseEntity.ok(portfolioService.createPortfolio(request));
+	}
 
-    // GET /api/portfolio/public/{slug} — public, no auth
-    @GetMapping("/public/{slug}")
-    public ResponseEntity<PortfolioResponse> getPublicPortfolio(
-            @PathVariable String slug) {
-        Portfolio portfolio = portfolioRepository.findByPublicUrlSlug(slug)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found"));
+	// PUT /api/portfolio/update
+	@PutMapping("/update")
+	public ResponseEntity<PortfolioResponse> updatePortfolio(@RequestBody PortfolioRequest request) {
+		return ResponseEntity.ok(portfolioService.updatePortfolio(request));
+	}
 
-        if (portfolio.getStatus() != Portfolio.Status.PUBLISHED) {
-            throw new RuntimeException("This portfolio is not published yet.");
-        }
+	// PUT /api/portfolio/publish
+	@PutMapping("/publish")
+	public ResponseEntity<PortfolioResponse> publishPortfolio() {
+		return ResponseEntity.ok(portfolioService.publishPortfolio());
+	}
 
-        // Increment views
-        portfolio.setViewsCount(portfolio.getViewsCount() + 1);
-        portfolioRepository.save(portfolio);
+	// GET /api/portfolio/public/{slug} — public, no auth
+	@GetMapping("/public/{slug}")
+	public ResponseEntity<PortfolioResponse> getPublicPortfolio(@PathVariable String slug) {
+		Portfolio portfolio = portfolioRepository.findByPublicUrlSlug(slug)
+				.orElseThrow(() -> new RuntimeException("Portfolio not found"));
+		// Check if the person making the request is an Admin
+		org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder
+				.getContext().getAuthentication();
 
-        List<Skill> skills = skillRepository
-                .findByPortfolioOrderByDisplayOrderAsc(portfolio);
-        return ResponseEntity.ok(new PortfolioResponse(portfolio, skills));
-    }
+		boolean isAdmin = auth != null
+				&& auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+		if (portfolio.getStatus() != Portfolio.Status.PUBLISHED) {
+			throw new RuntimeException("This portfolio is not published yet.");
+		}
 
-    // GET /api/portfolio/public/{slug}/projects — public projects list
-    @GetMapping("/public/{slug}/projects")
-    public ResponseEntity<List<ProjectResponse>> getPublicProjects(
-            @PathVariable String slug) {
-        Portfolio portfolio = portfolioRepository.findByPublicUrlSlug(slug)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found"));
+		// Increment views
+		portfolio.setViewsCount(portfolio.getViewsCount() + 1);
+		portfolioRepository.save(portfolio);
 
-        if (portfolio.getStatus() != Portfolio.Status.PUBLISHED) {
-            throw new RuntimeException("Portfolio not published");
-        }
+		List<Skill> skills = skillRepository.findByPortfolioOrderByDisplayOrderAsc(portfolio);
+		return ResponseEntity.ok(new PortfolioResponse(portfolio, skills));
+	}
 
-        List<ProjectResponse> projects = projectRepository
-                .findByPortfolioOrderByDisplayOrderAsc(portfolio)
-                .stream()
-                .map(ProjectResponse::new)
-                .collect(Collectors.toList());
+	// GET /api/portfolio/public/{slug}/projects — public projects list
+	@GetMapping("/public/{slug}/projects")
+	public ResponseEntity<List<ProjectResponse>> getPublicProjects(@PathVariable String slug) {
+		Portfolio portfolio = portfolioRepository.findByPublicUrlSlug(slug)
+				.orElseThrow(() -> new RuntimeException("Portfolio not found"));
 
-        return ResponseEntity.ok(projects);
-    }
-    
- // ==========================================
-    // --- Layout Customization Endpoints ---
-    // ==========================================
+		if (portfolio.getStatus() != Portfolio.Status.PUBLISHED) {
+			throw new RuntimeException("Portfolio not published");
+		}
 
-    @PutMapping("/layout")
-    public ResponseEntity<?> updateLayout(@RequestBody LayoutRequest request) {
-        // Find the user by email (we will send this from React)
-        Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
+		List<ProjectResponse> projects = projectRepository.findByPortfolioOrderByDisplayOrderAsc(portfolio).stream()
+				.map(ProjectResponse::new).collect(Collectors.toList());
 
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "User not found."));
-        }
+		return ResponseEntity.ok(projects);
+	}
 
-        User user = userOpt.get();
+	// ==========================================
+	// --- Layout Customization Endpoints ---
+	// ==========================================
 
-        // Update their preferences
-        user.setThemeColor(request.getThemeColor());
-        user.setBackgroundColor(request.getBackgroundColor());
-        user.setFontFamily(request.getFontFamily());
+	@PutMapping("/layout")
+	public ResponseEntity<?> updateLayout(@RequestBody LayoutRequest request) {
+		// Find the user by email (we will send this from React)
+		Optional<User> userOpt = userRepository.findByEmail(request.getEmail());
 
-        userRepository.save(user);
+		if (userOpt.isEmpty()) {
+			return ResponseEntity.badRequest().body(Map.of("error", "User not found."));
+		}
 
-        return ResponseEntity.ok(Map.of("message", "Layout updated successfully!"));
-    }
+		User user = userOpt.get();
 
-    // DTO to safely catch the incoming layout data from React
-    public static class LayoutRequest {
-        private String email;
-        private String themeColor;
-        private String backgroundColor;
-        private String fontFamily;
+		// Update their preferences
+		user.setThemeColor(request.getThemeColor());
+		user.setBackgroundColor(request.getBackgroundColor());
+		user.setFontFamily(request.getFontFamily());
 
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getThemeColor() { return themeColor; }
-        public void setThemeColor(String themeColor) { this.themeColor = themeColor; }
-        public String getBackgroundColor() { return backgroundColor; }
-        public void setBackgroundColor(String backgroundColor) { this.backgroundColor = backgroundColor; }
-        public String getFontFamily() { return fontFamily; }
-        public void setFontFamily(String fontFamily) { this.fontFamily = fontFamily; }
-    }
+		userRepository.save(user);
+
+		return ResponseEntity.ok(Map.of("message", "Layout updated successfully!"));
+	}
+
+	// DTO to safely catch the incoming layout data from React
+	public static class LayoutRequest {
+		private String email;
+		private String themeColor;
+		private String backgroundColor;
+		private String fontFamily;
+
+		public String getEmail() {
+			return email;
+		}
+
+		public void setEmail(String email) {
+			this.email = email;
+		}
+
+		public String getThemeColor() {
+			return themeColor;
+		}
+
+		public void setThemeColor(String themeColor) {
+			this.themeColor = themeColor;
+		}
+
+		public String getBackgroundColor() {
+			return backgroundColor;
+		}
+
+		public void setBackgroundColor(String backgroundColor) {
+			this.backgroundColor = backgroundColor;
+		}
+
+		public String getFontFamily() {
+			return fontFamily;
+		}
+
+		public void setFontFamily(String fontFamily) {
+			this.fontFamily = fontFamily;
+		}
+	}
 }

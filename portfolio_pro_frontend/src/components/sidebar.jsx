@@ -25,6 +25,7 @@ export default function Sidebar() {
     { icon: "✏", label: "Portfolio Builder", route: "/portfolio/builder" },
     { icon: "⬡", label: "Projects", route: "/projects" },
     { icon: "✉", label: "Messages", route: "/messages" },
+    { icon: "🎨", label: "Templates", route: "/templates" },
   ];
 
   return (

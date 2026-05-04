@@ -1,6 +1,6 @@
 // src/pages/PortfolioBuilder.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // <-- Add useLocation
 import {
   getMyPortfolio,
   createPortfolio,
@@ -9,6 +9,25 @@ import {
 import "./PortfolioBuilder.css";
 import Sidebar from "../components/Sidebar";
 import API from "../api/axiosConfig";
+import PublicPortfolio from "./PublicPortfolio";
+
+const TEMPLATE_OPTIONS = [
+  { id: "classic", name: "Classic Professional" },
+  { id: "modern", name: "Modern Sidebar" },
+  { id: "minimalist", name: "Clean Minimalist" },
+  { id: "devdark", name: "Developer Dark" },
+  { id: "agency", name: "Creative Agency" },
+  { id: "academic", name: "Academic Scholar" },
+  { id: "startup", name: "SaaS Startup" },
+  { id: "monochrome", name: "Monochrome" },
+  { id: "vibrant", name: "Vibrant Gradient" },
+  { id: "neobrutalism", name: "Neo-Brutalism" },
+  { id: "cards", name: "Card UI" },
+  { id: "timeline", name: "Timeline View" },
+  { id: "bento", name: "Apple Bento Box 👑" },
+  { id: "glassmorphism", name: "Glassmorphism 👑" },
+  { id: "notion", name: "Notion Document 👑" },
+];
 
 const THEMES = [
   { key: "default", label: "Classic Blue", color: "#4f9eff" },
@@ -29,7 +48,9 @@ export default function PortfolioBuilder() {
   const [saveMsg, setSaveMsg] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const queryParams = new URLSearchParams(window.location.search);
+  const selectedTemplate = queryParams.get("template") || "classic";
   const [form, setForm] = useState({
     title: "",
     designation: "",
@@ -38,6 +59,7 @@ export default function PortfolioBuilder() {
     linkedinUrl: "",
     websiteUrl: "",
     theme: "default",
+    template: selectedTemplate,
     publicUrlSlug: "",
     skills: [],
   });
@@ -54,30 +76,48 @@ export default function PortfolioBuilder() {
     loadExisting();
   }, []);
   // Add this function inside your component
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check file size (Optional but recommended so the database doesn't crash)
-      if (file.size > 2 * 1024 * 1024) {
-        alert("Image is too large! Please pick an image under 2MB.");
+      // Check file size (Max 5MB to match your backend rule)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image is too large! Please pick an image under 5MB.");
         return;
       }
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result; // This is the giant text string!
+      setUploadingImg(true);
+      const formData = new FormData();
+      formData.append("file", file);
 
-        // Update your portfolio state (change setPortfolio to whatever state you use)
-        setPortfolio((prev) => ({ ...prev, profileImage: base64String }));
-      };
+      try {
+        // Send the file to your existing Spring Boot backend
+        const res = await API.post("/api/upload/profile-image", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
 
-      reader.readAsDataURL(file); // This triggers the conversion
+        // The backend returns { imageUrl: "http://localhost:8080/uploads/..." }
+        // Save this URL to our local state so the preview updates immediately
+        setProfileImageUrl(res.data.imageUrl);
+      } catch (err) {
+        console.error("Upload failed", err);
+        alert("Failed to upload image. Make sure your backend is running.");
+      } finally {
+        setUploadingImg(false);
+      }
     }
   };
   const loadExisting = async () => {
     try {
+      // Fetch your saved portfolio
       const data = await getMyPortfolio();
+
+      // Check the URL to see if you just clicked a template in the Gallery
+      const queryParams = new URLSearchParams(location.search);
+      const urlTemplate = queryParams.get("template");
+
+      setProfileImageUrl(data.profileImage || "");
       setIsEdit(true);
+
       setForm({
         title: data.title || "",
         designation: data.designation || "",
@@ -86,6 +126,10 @@ export default function PortfolioBuilder() {
         linkedinUrl: data.linkedinUrl || "",
         websiteUrl: data.websiteUrl || "",
         theme: data.theme || "default",
+
+        // --- THE FIX: Make the URL selection win over the database! ---
+        template: urlTemplate || data.template || "classic",
+
         publicUrlSlug: data.publicUrlSlug || "",
         skills:
           data.skills?.map((s) => ({
@@ -96,6 +140,13 @@ export default function PortfolioBuilder() {
       });
     } catch {
       setIsEdit(false);
+
+      // Even if they don't have a portfolio yet, we still need to catch the template!
+      const queryParams = new URLSearchParams(location.search);
+      const urlTemplate = queryParams.get("template");
+      if (urlTemplate) {
+        setForm((prevForm) => ({ ...prevForm, template: urlTemplate }));
+      }
     } finally {
       setLoading(false);
     }
@@ -105,7 +156,7 @@ export default function PortfolioBuilder() {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
   };
-  
+
   const addSkill = () => {
     if (!newSkill.skillName.trim()) return;
     setForm({ ...form, skills: [...form.skills, { ...newSkill }] });
@@ -412,12 +463,11 @@ export default function PortfolioBuilder() {
           </div>
         )}
 
-        {/* STEP 3 — Theme & URL */}
         {step === 3 && (
           <div className="pb-panel">
             <div className="pb-panel-header">
-              <h2>Theme & Public URL</h2>
-              <p>Choose your style and set your portfolio address</p>
+              <h2>Design, Theme & Public URL</h2>
+              <p>Choose your layout, colors, and set your portfolio address</p>
             </div>
 
             <div className="pb-themes">
@@ -460,6 +510,58 @@ export default function PortfolioBuilder() {
               ))}
             </div>
 
+            {/* --- NEW TEMPLATE SELECTOR SECTION --- */}
+            <div
+              className="pb-templates-section"
+              style={{
+                marginBottom: "30px",
+                marginTop: "10px",
+                background: "#f8f9fa",
+                padding: "20px",
+                borderRadius: "8px",
+                border: "1px solid #e9ecef",
+              }}
+            >
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "10px",
+                  fontWeight: "bold",
+                  color: "#333",
+                }}
+              >
+                🎨 Selected Layout Template
+              </label>
+              <select
+                value={form.template || "classic"}
+                onChange={(e) => setForm({ ...form, template: e.target.value })}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "6px",
+                  border: "1px solid #ccc",
+                  fontSize: "16px",
+                  backgroundColor: "white",
+                }}
+              >
+                {TEMPLATE_OPTIONS.map((tpl) => (
+                  <option key={tpl.id} value={tpl.id}>
+                    {tpl.name}
+                  </option>
+                ))}
+              </select>
+              <p
+                style={{
+                  margin: "10px 0 0 0",
+                  fontSize: "13px",
+                  color: "#666",
+                }}
+              >
+                You selected this from the Template Gallery. You can change it
+                here at any time!
+              </p>
+            </div>
+
             <div className="pb-url-section">
               <label>Public Portfolio URL</label>
               <div className="pb-url-input-wrap">
@@ -488,57 +590,51 @@ export default function PortfolioBuilder() {
 
         {/* STEP 4 — Preview */}
         {step === 4 && (
-          <div className="pb-panel">
-            <div className="pb-panel-header">
-              <h2>Preview & Finish</h2>
-              <p>Review your portfolio before publishing</p>
-            </div>
-            <div className="pb-preview-card">
-              <div className="pb-preview-header">
-                <div className="pb-preview-avatar">
-                  {(form.title || "U")[0].toUpperCase()}
-                </div>
-                <div>
-                  <h3>{form.title || "Your Name"}</h3>
-                  <p>{form.designation || "Your Role"}</p>
-                </div>
-              </div>
-              <p className="pb-preview-bio">
-                {form.bio || "Your bio will appear here."}
-              </p>
-              {form.skills.length > 0 && (
-                <div className="pb-preview-skills">
-                  {form.skills.map((s, i) => (
-                    <span key={i} className="db-skill-tag">
-                      {s.skillName}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {form.publicUrlSlug && (
-                <div className="pb-preview-url">
-                  🔗 portfoliopro.com/<strong>{form.publicUrlSlug}</strong>
-                </div>
-              )}
-              <div className="pb-preview-theme">
-                Theme:{" "}
-                <strong>
-                  {THEMES.find((t) => t.key === form.theme)?.label}
-                </strong>
-              </div>
+          <div className="pb-panel" style={{ padding: 0, overflow: "hidden" }}>
+            <div
+              className="pb-panel-header"
+              style={{ padding: "30px", borderBottom: "1px solid #eee" }}
+            >
+              <h2>Live Preview & Finish</h2>
+              <p>This is exactly how your portfolio will look to visitors.</p>
             </div>
 
-            <button
-              className="pb-finish-btn"
-              onClick={handleFinish}
-              disabled={saving}
+            {/* Embedded Live Template */}
+            <div style={{ height: "60vh", overflowY: "auto", background: "#eee" }}>
+              <PublicPortfolio 
+                previewMode={true}
+                mockData={{
+                  portfolio: {
+                    ...form,  // <--- This pushes your live dropdown choice into the preview!
+                    userName: form.title || "Your Name",
+                    profileImage: profileImageUrl, 
+                    status: "PUBLISHED" 
+                  },
+                  projects: [] 
+                }} 
+              />
+            </div>
+
+            <div
+              style={{
+                padding: "30px",
+                background: "white",
+                borderTop: "1px solid #eee",
+              }}
             >
-              {saving
-                ? "Saving..."
-                : isEdit
-                  ? "✓ Save & Go to Dashboard"
-                  : "🚀 Create Portfolio"}
-            </button>
+              <button
+                className="pb-finish-btn"
+                onClick={handleFinish}
+                disabled={saving}
+                style={{ width: "100%" }}
+              >
+                {saving
+                  ? "Saving..."
+                  : isEdit
+                    ? "✓ Save & Go to Dashboard"
+                    : "🚀 Publish Portfolio"}
+              </button>
+            </div>
           </div>
         )}
 

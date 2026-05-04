@@ -506,7 +506,7 @@ export default function AdminDashboard() {
                                 Unpublish
                               </button>
                             )}
-                            {p.publicUrlSlug && p.status === "PUBLISHED" && (
+                            {p.publicUrlSlug && (
                               <a
                                 href={`/p/${p.publicUrlSlug}`}
                                 target="_blank"
